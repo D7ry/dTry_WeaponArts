@@ -2,28 +2,37 @@
 using namespace std;
 class waObj {
 public:
-	/*parse a string from ini and construct a weaponArt object*/
-	waObj(string ) {
-
-	}
 	/*calculation method for spell manitude*/
 	enum MAG_OVERRIDE {
 		identity = 0, //equal to 1
 		attackDamage = 1, //equal to the character's attack damage
 	};
 
-	void processWeaponArt(RE::Actor* a_actor, string anno) {
-		if (anno != _anno) {
-			DEBUG("failed anno check: input anno: {} not equal to expected anno:{}", anno, _anno);
+	/*construct a weaponArt object*/
+	waObj(string anno, RE::TESObjectWEAP* weapon, RE::SpellItem* spell, int magOverride_int, float staminaCost, float magickaCost, bool powerOnly, bool pcOnly) {
+		_anno = anno;
+		_weapon = weapon;
+		_spell = spell;
+		_magOverride = static_cast<MAG_OVERRIDE>(magOverride_int);
+		_staminaCost = staminaCost;
+		_magickaCost = magickaCost;
+		_powerOnly = powerOnly;
+		_pcOnly = pcOnly;
+		DEBUG("successfully constructed weapon art obj! anno: {}, weapon: {}, spell: {}", anno, weapon->GetName(), spell->GetName());
+	}
+
+	void processWeaponArt(RE::Actor* a_actor, string a_anno) {
+		if (a_anno != _anno) {
+			DEBUG("failed anno check: input anno: {} not equal to expected anno:{}", a_anno, _anno);
 			return;
 		}
-		auto weapon = a_actor->GetAttackingWeapon();
-		if (weapon) {
+		if (a_actor->GetAttackingWeapon() || !a_actor->GetAttackingWeapon()->object) { //FIXME:maybe use macro to make it more efficient
 			DEBUG("actor has no attacking weapon");
 			return;
 		}
-		if (weapon->object != _weapon) {
-			DEBUG("failed weapon acheck: input weapon: {} not equal to expected weapon: {}", weapon->object->GetName(), _weapon->GetName());
+		auto weapon = a_actor->GetAttackingWeapon()->object->As<RE::TESObjectWEAP>();
+		if (weapon != _weapon) {
+			DEBUG("failed weapon acheck: input weapon: {} not equal to expected weapon: {}", weapon->GetName(), _weapon->GetName());
 		}
 		if (_powerOnly) {
 			if (a_actor && a_actor->currentProcess && a_actor->currentProcess->high && a_actor->currentProcess->high->attackData && a_actor->currentProcess->high->attackData->data.flags.any(RE::AttackData::AttackFlag::kPowerAttack)) {
@@ -36,11 +45,13 @@ public:
 			return;
 		}
 		//passing all the checks above initializes weapon art.
-		launchWeaponArt(a_actor);
+		DEBUG("all checks passed, launching weapon art!");
+		launchWeaponArt(a_actor, weapon);
+		DEBUG("weapon art launched!");
 	}
 
 private:
-	inline void launchWeaponArt(RE::Actor* a_actor);
+	inline void launchWeaponArt(RE::Actor* a_actor, RE::TESObjectWEAP* a_weapon);
 	/*spell to cast for the weapon art*/
 	RE::SpellItem* _spell;
 	/*the weapon bounded to weapon art*/
