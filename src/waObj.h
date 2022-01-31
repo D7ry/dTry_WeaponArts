@@ -37,7 +37,7 @@ public:
 			return;
 		}
 		if (_powerOnly) {
-			if (a_actor && a_actor->currentProcess && a_actor->currentProcess->high && a_actor->currentProcess->high->attackData && a_actor->currentProcess->high->attackData->data.flags.any(RE::AttackData::AttackFlag::kPowerAttack)) {
+			if (!a_actor || !a_actor->currentProcess || !a_actor->currentProcess->high || !a_actor->currentProcess->high->attackData || !a_actor->currentProcess->high->attackData->data.flags.any(RE::AttackData::AttackFlag::kPowerAttack)) {
 				DEBUG("failed power check: actor has to be power attacking while they are not.");
 				return;
 			}
