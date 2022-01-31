@@ -4,12 +4,12 @@ class waObj {
 public:
 	/*calculation method for spell manitude*/
 	enum MAG_OVERRIDE {
-		identity = 0, //equal to 1
-		attackDamage = 1, //equal to the character's attack damage
+		attackDamage = 0, //equal to the character's attack damage
+		identity = 1, //equal to 1
 	};
 
 	/*construct a weaponArt object*/
-	waObj(RE::TESObjectWEAP* weapon, RE::SpellItem* spell, int magOverride_int, float staminaCost, float magickaCost, bool powerOnly, bool pcOnly) {
+	waObj(std::string name, RE::TESObjectWEAP* weapon, RE::SpellItem* spell, int magOverride_int, float staminaCost, float magickaCost, bool powerOnly, bool pcOnly) {
 		_weapon = weapon;
 		_spell = spell;
 		_magOverride = static_cast<MAG_OVERRIDE>(magOverride_int);
@@ -17,7 +17,7 @@ public:
 		_magickaCost = magickaCost;
 		_powerOnly = powerOnly;
 		_pcOnly = pcOnly;
-		//_debugMsg = "poggers";
+		_name = name;
 		DEBUG("successfully constructed weapon art obj! weapon: {}, spell: {}", weapon->GetName(), spell->GetName());
 	}
 
@@ -27,7 +27,7 @@ public:
 			return;
 		}
 		auto weapon = a_actor->GetAttackingWeapon()->object;
-		if (weapon) {
+		if (!weapon) {
 			DEBUG("weapon object doesn't exist");
 			return;
 		}
@@ -47,27 +47,23 @@ public:
 			return;
 		}
 		//passing all the checks above initializes weapon art.
-		DEBUG("all checks passed, launching weapon art!");
+		DEBUG("all checks passed, launching weapon art {}!", _name);
 		launchWeaponArt(a_actor, weapon->As<RE::TESObjectWEAP>());
-		DEBUG("weapon art launched!");
 	}
 
 	void printInfo() {
-		INFO("printing waObj info!");
-		INFO("debug message: {}", _debugMsg);
 		if (_spell) {
-			INFO("spell is {}", _spell->GetName());
+			INFO("spell: {}", _spell->GetName());
 		}
 		else {
 			INFO("spell not found!");
 		}
 		if (_weapon) {
-			INFO("weapon is {}", _weapon->GetName());
+			INFO("weapon: {}", _weapon->GetName());
 		}
 		else {
 			INFO("weapon not found!");
 		}
-		//INFO("a weapon art casting spell {}, for weapon {}, bounded to annotation {}", _spell->GetName(), _weapon->GetName(), _anno);
 	};
 
 
@@ -87,7 +83,8 @@ private:
 	/*calculation method for spell magnitude*/
 	MAG_OVERRIDE _magOverride;
 public:
-	std::string _debugMsg;
+	/*my name*/
+	std::string _name;
 
 
 };
