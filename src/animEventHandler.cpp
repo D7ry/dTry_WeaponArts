@@ -10,7 +10,8 @@ RE::BSEventNotifyControl animEventHandler::HookedProcessEvent(RE::BSAnimationGra
         //DEBUG("processing weapon arts from the set");
         //DEBUG("there are currently {} obj from the set", weaponArts::weaponArtsMap.size());
         DEBUG("anim event: {}", static_cast<std::string>(a_event.tag));
-        auto it = weaponArts::weaponArtsMap.find(static_cast<std::string>(a_event.tag));
+        DEBUG("payload: {}", static_cast<std::string>(a_event.payload));
+        auto it = weaponArts::weaponArtsMap.find(static_cast<std::string>(a_event.payload));
         if (it != weaponArts::weaponArtsMap.end()) {
             std::vector<waObj>& arr = it->second;
             for (auto weaponArtObj = arr.begin(); weaponArtObj != arr.end(); ++weaponArtObj) {

@@ -5,8 +5,9 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 {
 	switch (a_msg->type) {
 	case SKSE::MessagingInterface::kDataLoaded:
+		INFO("data loaded, reading config files!");
 		//dataHandler::testInsertWeaponArt();
-		dataHandler::readIni();
+		dataHandler::readIniS();
 		((animEventHandler*)((uintptr_t)RE::PlayerCharacter::GetSingleton() + 0x30))->HookSink();
 		DEBUG("event sinked!");
 		break;
