@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_set>
+#include "waObj.h"
 class animEventHandler {
 public:
     template<class Ty>
@@ -48,3 +50,4 @@ public:
 protected:
     static std::unordered_map<uint64_t, FnProcessEvent> fnHash;
 };
+

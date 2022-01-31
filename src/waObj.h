@@ -9,8 +9,7 @@ public:
 	};
 
 	/*construct a weaponArt object*/
-	waObj(string anno, RE::TESObjectWEAP* weapon, RE::SpellItem* spell, int magOverride_int, float staminaCost, float magickaCost, bool powerOnly, bool pcOnly) {
-		_anno = anno;
+	waObj(RE::TESObjectWEAP* weapon, RE::SpellItem* spell, int magOverride_int, float staminaCost, float magickaCost, bool powerOnly, bool pcOnly) {
 		_weapon = weapon;
 		_spell = spell;
 		_magOverride = static_cast<MAG_OVERRIDE>(magOverride_int);
@@ -18,21 +17,24 @@ public:
 		_magickaCost = magickaCost;
 		_powerOnly = powerOnly;
 		_pcOnly = pcOnly;
-		DEBUG("successfully constructed weapon art obj! anno: {}, weapon: {}, spell: {}", anno, weapon->GetName(), spell->GetName());
+		//_debugMsg = "poggers";
+		DEBUG("successfully constructed weapon art obj! weapon: {}, spell: {}", weapon->GetName(), spell->GetName());
 	}
 
-	void processWeaponArt(RE::Actor* a_actor, string a_anno) {
-		if (a_anno != _anno) {
-			DEBUG("failed anno check: input anno: {} not equal to expected anno:{}", a_anno, _anno);
-			return;
-		}
-		if (a_actor->GetAttackingWeapon() || !a_actor->GetAttackingWeapon()->object) { //FIXME:maybe use macro to make it more efficient
+	void processWeaponArt(RE::Actor* a_actor) {
+		if (!a_actor->GetAttackingWeapon()) {
 			DEBUG("actor has no attacking weapon");
 			return;
 		}
-		auto weapon = a_actor->GetAttackingWeapon()->object->As<RE::TESObjectWEAP>();
-		if (weapon != _weapon) {
+		auto weapon = a_actor->GetAttackingWeapon()->object;
+		if (weapon) {
+			DEBUG("weapon object doesn't exist");
+			return;
+		}
+		if (weapon->GetFormID() != _weapon->GetFormID()) {
 			DEBUG("failed weapon acheck: input weapon: {} not equal to expected weapon: {}", weapon->GetName(), _weapon->GetName());
+			DEBUG("input weapon formid: {}, expected weapon formid: {}", weapon->formID, _weapon->formID);
+			return;
 		}
 		if (_powerOnly) {
 			if (a_actor && a_actor->currentProcess && a_actor->currentProcess->high && a_actor->currentProcess->high->attackData && a_actor->currentProcess->high->attackData->data.flags.any(RE::AttackData::AttackFlag::kPowerAttack)) {
@@ -46,12 +48,31 @@ public:
 		}
 		//passing all the checks above initializes weapon art.
 		DEBUG("all checks passed, launching weapon art!");
-		launchWeaponArt(a_actor, weapon);
+		launchWeaponArt(a_actor, weapon->As<RE::TESObjectWEAP>());
 		DEBUG("weapon art launched!");
 	}
 
+	void printInfo() {
+		INFO("printing waObj info!");
+		INFO("debug message: {}", _debugMsg);
+		if (_spell) {
+			INFO("spell is {}", _spell->GetName());
+		}
+		else {
+			INFO("spell not found!");
+		}
+		if (_weapon) {
+			INFO("weapon is {}", _weapon->GetName());
+		}
+		else {
+			INFO("weapon not found!");
+		}
+		//INFO("a weapon art casting spell {}, for weapon {}, bounded to annotation {}", _spell->GetName(), _weapon->GetName(), _anno);
+	};
+
+
 private:
-	inline void launchWeaponArt(RE::Actor* a_actor, RE::TESObjectWEAP* a_weapon);
+	void launchWeaponArt(RE::Actor* a_actor, RE::TESObjectWEAP* a_weapon);
 	/*spell to cast for the weapon art*/
 	RE::SpellItem* _spell;
 	/*the weapon bounded to weapon art*/
@@ -63,8 +84,10 @@ private:
 	/*stamina and magicka cost for each skill*/
 	float _staminaCost;
 	float _magickaCost;
-	/*annotation triggering the weapon art*/
-	string _anno;
 	/*calculation method for spell magnitude*/
 	MAG_OVERRIDE _magOverride;
+public:
+	std::string _debugMsg;
+
+
 };

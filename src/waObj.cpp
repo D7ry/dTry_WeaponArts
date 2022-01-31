@@ -1,3 +1,4 @@
+#pragma once
 #include "waObj.h"
 #include "Utils.h"
 void waObj::launchWeaponArt(RE::Actor* a_actor, RE::TESObjectWEAP* a_weapon) {
@@ -11,7 +12,7 @@ void waObj::launchWeaponArt(RE::Actor* a_actor, RE::TESObjectWEAP* a_weapon) {
 	default: magOverride = 1;
 	}
 	a_actor->GetMagicCaster(RE::MagicSystem::CastingSource::kInstant)->InstantCast(_spell, false, nullptr, 1, true, magOverride, a_actor);
-	DEBUG("weapon art launched!");
+
 }
 
 //TODO:add blinking effects iff stamina/magicka isn't enough?
