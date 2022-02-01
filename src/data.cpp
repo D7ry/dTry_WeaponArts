@@ -1,4 +1,5 @@
 #include "data.h"
+#include <regex>
 /*iterate through all .ini files in the directory.*/
 void dataHandler::readIniS() {
 	INFO("Loading settings from directory: " + weaponArts::weaponArtsDir);
@@ -19,18 +20,23 @@ void dataHandler::readSingleIni(const char* ini_path) {
 	for (CSimpleIniA::TNamesDepend::iterator s_it1 = keys.begin(); s_it1 != keys.end(); s_it1++) {
 		const char* wa_Name = s_it1->pItem;
 		std::string wa_strToParse = ini.GetValue("WeaponArts", wa_Name);
-		readLine(wa_strToParse, wa_Name);
-		weaponArtCt++;
+		if (readLine(wa_strToParse, wa_Name)) {
+			weaponArtCt++;
+		}
 	}
-	INFO("Loaded {} weapon art.", weaponArtCt);
+	INFO("Successfully loaded {} weapon art.", weaponArtCt);
 }
 
 /*read a line from ini, parse it and see if it's valid.
 if it's valid, insert the weapon art into the hash map.
 a sample line: hitframe|0x00012EB7|Skyrim.esm|30|20|1|
 @param a_name the name of weapon art, as the key in the ini that's being passed in*/
-void dataHandler::readLine(std::string a_line, std::string a_name) {
+bool dataHandler::readLine(std::string a_line, std::string a_name) {
 	INFO("Found weapon art {}, config line: {}", a_name, a_line);
+	if (!std::regex_match(a_line, std::regex("((\\w|\\.)+\\|){3}((\\d|\\.)+\\|){3}(\\d)+"))) {
+		INFO("Error: wrong config line format; failed to read this weapon art.");
+		return false;
+	}
 	string anno;
 	RE::SpellItem* spell;
 	int magOverride_enum_int;
@@ -38,33 +44,26 @@ void dataHandler::readLine(std::string a_line, std::string a_name) {
 	float staminaCost;
 	float magickCost;
 	int spellForm = 0;
-	DEBUG("parsing...");
 	vector<string> arr = Utils::parseStr("|", a_line);
-	DEBUG("finished parsing");
+	DEBUG("check art size");
 	anno = arr[0];
-	DEBUG("1");
 	if (Utils::ToInt(arr[1], spellForm))
 	{
 		if (spellForm == 0) {
-			return;
+			INFO("Error: wrong spell formID, failed to read this weapon art.");
+			return false;
 		}
 	}
-	DEBUG("2");
 	spell = RE::TESDataHandler::GetSingleton()->LookupForm<RE::SpellItem>(spellForm, arr[2]);
-	DEBUG("3");
 	staminaCost = std::stof(arr[3]);
-	DEBUG("4");
 	magickCost = std::stof(arr[4]);
-	DEBUG("5");
 	magOverride_enum_int = std::stoi(arr[5]);
-	DEBUG("6");
 	magOverride_CustomVal = std::stof(arr[6]);
-	DEBUG("7");
-	DEBUG("finished assigning");
 	if (!spell) {
-		INFO("Error: Failed to read spell; check your ini.");
-		return;
+		INFO("Error: Incorrect spell formID or incorrect plugin name. Failed to read spell from plugin ", arr[2]);
+		return false;
 	}
 	waObj a_waObj = waObj(a_name, spell, magOverride_enum_int, magOverride_CustomVal, staminaCost, magickCost);
 	safeInsert(anno, a_waObj);
+	return true;
 }

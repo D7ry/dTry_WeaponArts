@@ -18,7 +18,7 @@ public:
 		_staminaCost = staminaCost;
 		_magickaCost = magickaCost;
 		_name = name;
-		INFO("successfully constructed weapon art obj for spell: {}", spell->GetName());
+		INFO("successfully constructed weapon art obj. Name: {}, Spell: {}, Stamina Cost: {}, Magicka Cost: {}, Magnitde Override Method: {}, Custom Override Value: {}", _name, _spell->GetName(), _staminaCost, _magickaCost, _magOverrideType, magOverrideCustomVal);
 	}
 
 	void processWeaponArt(RE::Actor* a_actor) {

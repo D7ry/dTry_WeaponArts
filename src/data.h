@@ -27,7 +27,7 @@ private:
 	static inline void readSingleIni(const char* ini_path);
 
 
-	static inline void readLine(std::string a_line, std::string a_name);
+	static inline bool readLine(std::string a_line, std::string a_name);
 
 	/*insert weapon art into the hashmap*/
 	static void safeInsert(std::string a_anno, waObj a_waObj) {
