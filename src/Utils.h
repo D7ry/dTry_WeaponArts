@@ -22,7 +22,7 @@ namespace Utils
 		value = ret;
 		return true;
 	}
-
+    using namespace std;
     inline vector<string> parseStr(const string& delimiter, const string& str)
     {
         vector<string> arr;
