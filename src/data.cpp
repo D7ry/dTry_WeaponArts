@@ -2,7 +2,7 @@
 #include <regex>
 /*iterate through all .ini files in the directory.*/
 void dataHandler::readIniS() {
-	INFO("Loading settings from directory: " + weaponArts::weaponArtsDir);
+	INFO("loading config from: " + weaponArts::weaponArtsDir);
 	for (const auto& entry : std::filesystem::directory_iterator(weaponArts::weaponArtsDir)) { //iterates through all .ini files
 		string pathStr = entry.path().string();
 		INFO("Reading from {}", pathStr);
@@ -33,19 +33,20 @@ a sample line: hitframe|0x00012EB7|Skyrim.esm|30|20|1|
 @param a_name the name of weapon art, as the key in the ini that's being passed in*/
 bool dataHandler::readLine(std::string a_line, std::string a_name) {
 	INFO("Found weapon art {}, config line: {}", a_name, a_line);
-	if (!std::regex_match(a_line, std::regex("((\\w|\\.)+\\|){3}((\\d|\\.)+\\|){3}(\\d)+"))) {
+	if (!std::regex_match(a_line, std::regex("((\\w|\\.|\\s)+\\|){3}((\\d|\\.)+\\|){5}(\\d)+"))) {
 		INFO("Error: wrong config line format; failed to read this weapon art.");
 		return false;
 	}
 	string anno;
 	RE::SpellItem* spell;
+	int effectiveness_enum_int;
+	float effectiveness_CustomVal;
 	int magOverride_enum_int;
 	float magOverride_CustomVal;
 	float staminaCost;
 	float magickCost;
 	int spellForm = 0;
 	vector<string> arr = Utils::parseStr("|", a_line);
-	DEBUG("check art size");
 	anno = arr[0];
 	if (Utils::ToInt(arr[1], spellForm))
 	{
@@ -57,13 +58,15 @@ bool dataHandler::readLine(std::string a_line, std::string a_name) {
 	spell = RE::TESDataHandler::GetSingleton()->LookupForm<RE::SpellItem>(spellForm, arr[2]);
 	staminaCost = std::stof(arr[3]);
 	magickCost = std::stof(arr[4]);
-	magOverride_enum_int = std::stoi(arr[5]);
-	magOverride_CustomVal = std::stof(arr[6]);
+	effectiveness_enum_int = std::stoi(arr[5]);
+	effectiveness_CustomVal = std::stof(arr[6]);
+	magOverride_enum_int = std::stoi(arr[7]);
+	magOverride_CustomVal = std::stof(arr[8]);
 	if (!spell) {
 		INFO("Error: Incorrect spell formID or incorrect plugin name. Failed to read spell from plugin ", arr[2]);
 		return false;
 	}
-	waObj a_waObj = waObj(a_name, spell, magOverride_enum_int, magOverride_CustomVal, staminaCost, magickCost);
+	waObj a_waObj = waObj(a_name, spell, effectiveness_enum_int, effectiveness_CustomVal, magOverride_enum_int, magOverride_CustomVal, staminaCost, magickCost);
 	safeInsert(anno, a_waObj);
 	return true;
 }
