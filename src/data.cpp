@@ -32,8 +32,8 @@ if it's valid, insert the weapon art into the hash map.
 a sample line: hitframe|0x00012EB7|Skyrim.esm|30|20|1|
 @param a_name the name of weapon art, as the key in the ini that's being passed in*/
 bool dataHandler::readLine(std::string a_line, std::string a_name) {
-	INFO("Found weapon art {}, config line: {}", a_name, a_line);
-	if (!std::regex_match(a_line, std::regex("((\\w|\\.|\\s)+\\|){3}((\\d|\\.)+\\|){5}(\\d)+"))) {
+	INFO("Weapon art {}, config line: {}", a_name, a_line);
+	if (!std::regex_match(a_line, std::regex("((\\w)+\\|){2}((\\w|\\.|\\s)+\\|)((\\d)+\\|){5}(\\d)+"))) {
 		INFO("Error: wrong config line format; failed to read this weapon art.");
 		return false;
 	}
