@@ -26,7 +26,7 @@ public:
 		_staminaCost = staminaCost;
 		_magickaCost = magickaCost;
 		_name = name;
-		INFO("successfully constructed weapon art obj. Name: {}, Spell: {}, Stamina Cost: {}, Magicka Cost: {}, Effectiveness Method: {}, Custom effectiveness value: {}, Magnitude Override Method: {}, Custom Override Value: {}", 
+		INFO("Success: constructed weapon art obj. Name: {}, Spell: {}, Stamina Cost: {}, Magicka Cost: {}, Effectiveness Method: {}, Custom effectiveness value: {}, Magnitude Override Method: {}, Custom Override Value: {}", 
 			_name, _spell->GetName(), _staminaCost, _magickaCost, _effectivenessType, _effectivenessCustomVal,_magOverrideType, magOverrideCustomVal);
 	}
 
