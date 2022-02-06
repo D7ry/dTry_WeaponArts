@@ -8,7 +8,10 @@ void MessageHandler(SKSE::MessagingInterface::Message* a_msg)
 		INFO("data loaded, reading config files!");
 		//dataHandler::testInsertWeaponArt();
 		dataHandler::readIniS();
-		((animEventHandler*)((uintptr_t)RE::PlayerCharacter::GetSingleton() + 0x30))->HookSink();
+		REL::Relocation<uintptr_t> npcPtr{ REL::ID(261399) };
+		REL::Relocation<uintptr_t> pcPtr{ REL::ID(261918) };
+		animEventHandler::GetSingleton()->HookSink(pcPtr.address());
+		animEventHandler::GetSingleton()->HookSink(npcPtr.address());
 		DEBUG("event sinked!");
 		break;
 	}
