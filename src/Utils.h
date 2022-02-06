@@ -1,6 +1,23 @@
 #pragma once
 namespace Utils
 {
+    /*returns maximum weapon damage of actor a. If a is not holding a wepaon,
+    return their unarmed damage.*/
+    inline float getMaximumWeaponDamage(RE::Actor* a) {
+        if (a) {
+            auto weaponR = a->GetEquippedObject(false);
+            if (weaponR && weaponR->GetFormType() == RE::FormType::Weapon) {
+                return weaponR->As<RE::TESObjectWEAP>()->GetAttackDamage();
+            }
+            auto weaponL = a->GetEquippedObject(true);
+            if (weaponL && weaponL->GetFormType() == RE::FormType::Weapon) {
+                return weaponL->As<RE::TESObjectWEAP>()->GetAttackDamage();
+            }
+            return a->GetActorValue(RE::ActorValue::kUnarmedDamage);
+        }
+        return 0;
+    }
+
 	inline void damageav(RE::Actor* a, RE::ActorValue av, float val)
 	{
 		if (a) {
@@ -53,4 +70,6 @@ namespace Utils
         arr.push_back(str.substr(k, i - k));
         return arr;
     }
+
+
 }

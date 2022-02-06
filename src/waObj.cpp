@@ -12,15 +12,29 @@ void waObj::processWeaponArt(RE::Actor* a_actor) {
 	Utils::damageav(a_actor, RE::ActorValue::kStamina, _staminaCost);
 	Utils::damageav(a_actor, RE::ActorValue::kMagicka, _magickaCost);
 	//calculate maginutude override of spell.
-	float effectiveness;
+	float effectiveness = 0;
 	switch (_effectivenessType) {
-	case EFFECTIVENESS::EattackDamage: effectiveness = a_actor->GetAttackingWeapon()->object->As<RE::TESObjectWEAP>()->GetAttackDamage() * a_actor->GetActorValue(RE::ActorValue::kAttackDamageMult); break;
+	case EFFECTIVENESS::EattackDamage: 
+		if (a_actor->GetAttackingWeapon()) {
+			effectiveness = a_actor->GetAttackingWeapon()->object->As<RE::TESObjectWEAP>()->GetAttackDamage() * a_actor->GetActorValue(RE::ActorValue::kAttackDamageMult);
+		}
+		else {
+			effectiveness = Utils::getMaximumWeaponDamage(a_actor);
+		}
+		break;
 	case EFFECTIVENESS::Ecustom: effectiveness = _effectivenessCustomVal; break;
 	default: effectiveness = 0;
 	}
-	float magOverride;
+	float magOverride = 0;
 	switch (_magOverrideType) {
-	case MAG_OVERRIDE::MattackDamage: magOverride = a_actor->GetAttackingWeapon()->object->As<RE::TESObjectWEAP>()->GetAttackDamage() * a_actor->GetActorValue(RE::ActorValue::kAttackDamageMult); break;
+	case MAG_OVERRIDE::MattackDamage: 
+		if (a_actor->GetAttackingWeapon()) {
+			magOverride = a_actor->GetAttackingWeapon()->object->As<RE::TESObjectWEAP>()->GetAttackDamage() * a_actor->GetActorValue(RE::ActorValue::kAttackDamageMult);
+		}
+		else {
+			magOverride = Utils::getMaximumWeaponDamage(a_actor);
+		}
+		break;
 	case MAG_OVERRIDE::Mcustom: magOverride = _magOverrideCustomVal; break;
 	default: magOverride = 0;
 	}
